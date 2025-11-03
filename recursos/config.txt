@@ -1,0 +1,6 @@
+num_clientes=3
+mensajes_por_cliente=5
+num_filtros=2
+num_servidores=3
+capacidad_entrada=5
+capacidad_entrega=5
