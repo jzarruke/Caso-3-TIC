@@ -24,7 +24,7 @@ public class Main {
         BuzonEntrega entrega = new BuzonEntrega(capacidadEntrega);
         Coordinador coord = new Coordinador(numClientes, entrada, cuarentena, entrega);
         List<Thread> clientes = new ArrayList<>();
-        for (int i = 0; i < numClientes; i++) clientes.add(new ClienteEmisor(i + 1, mensajesPorCliente, entrada, coord));
+        for (int i = 0; i < numClientes; i++) clientes.add(new Cliente(i + 1, mensajesPorCliente, entrada, coord));
         List<Thread> filtros = new ArrayList<>();
         for (int i = 0; i < numFiltros; i++) filtros.add(new FiltroSpam(i + 1, entrada, cuarentena, entrega, coord, numServidores));
         AdministradorCuarentena admin = new AdministradorCuarentena(cuarentena, entrega);
