@@ -1,5 +1,4 @@
 import java.util.Random;
-
 public class FiltroSpam extends Thread {
     private final BuzonEntrada entrada;
     private final Cuarentena cuarentena;
@@ -8,7 +7,6 @@ public class FiltroSpam extends Thread {
     private final int servidores;
     private final int filtros;
     private final Random rnd = new Random();
-
     public FiltroSpam(int id,
                       BuzonEntrada entrada,
                       Cuarentena cuarentena,
@@ -24,7 +22,6 @@ public class FiltroSpam extends Thread {
         this.servidores = servidores;
         this.filtros = filtros;
     }
-
     @Override
     public void run() {
         while (true) {
@@ -51,12 +48,10 @@ public class FiltroSpam extends Thread {
                     continue;
                 }
             }
-
             coord.intentarCerrar(servidores, filtros);
         }
         coord.intentarCerrar(servidores, filtros);
     }
-
     private void publicarEnEntrega(Mensaje m) {
         boolean hecho = false;
         while (!hecho) {

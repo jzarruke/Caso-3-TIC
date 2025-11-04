@@ -1,6 +1,5 @@
 import java.util.ArrayDeque;
 import java.util.Queue;
-
 public class BuzonEntrada {
     private final Queue<Mensaje> cola = new ArrayDeque<>();
     private final int capacidad;
@@ -9,7 +8,6 @@ public class BuzonEntrada {
         if (capacidad <= 0) throw new IllegalArgumentException("capEntrada debe ser > 0");
         this.capacidad = capacidad;
     }
-
     public synchronized void depositar(Mensaje m) {
         while (cola.size() >= capacidad) {
             try { wait(); } catch (InterruptedException ignored) {}
@@ -17,7 +15,6 @@ public class BuzonEntrada {
         cola.add(m);
         notifyAll();
     }
-
     public synchronized Mensaje extraer() {
         while (cola.isEmpty()) {
             try { wait(); } catch (InterruptedException ignored) {}
@@ -26,6 +23,5 @@ public class BuzonEntrada {
         notifyAll();
         return m;
     }
-
     public synchronized boolean vacio() { return cola.isEmpty(); }
 }

@@ -1,7 +1,6 @@
 public class Coordinador {
     private final int totalClientes;
     private int finClientes = 0;
-
     private final BuzonEntrada entrada;
     private final Cuarentena cuarentena;
     private final BuzonEntrega entrega;
@@ -19,7 +18,6 @@ public class Coordinador {
         this.cuarentena = cuarentena;
         this.entrega = entrega;
     }
-
     public synchronized void registrarFinCliente() {
         finClientes++;
         notifyAll();

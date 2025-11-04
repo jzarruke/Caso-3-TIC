@@ -1,12 +1,10 @@
 import java.util.List;
-
 public class AdministradorCuarentena extends Thread {
     private final Cuarentena cuarentena;
     private final BuzonEntrega entrega;
     private final Coordinador coord;
     private final int servidores;
     private final int filtros;
-
     public AdministradorCuarentena(Cuarentena cuarentena,
                                    BuzonEntrega entrega,
                                    Coordinador coord,
@@ -19,7 +17,6 @@ public class AdministradorCuarentena extends Thread {
         this.servidores = servidores;
         this.filtros = filtros;
     }
-
     @Override
     public void run() {
         while (true) {
@@ -32,7 +29,6 @@ public class AdministradorCuarentena extends Thread {
         }
         coord.intentarCerrar(servidores, filtros);
     }
-
     private void publicarEnEntrega(Mensaje m) {
         boolean hecho = false;
         while (!hecho) {

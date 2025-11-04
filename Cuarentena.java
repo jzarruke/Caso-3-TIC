@@ -1,10 +1,8 @@
 import java.util.LinkedList;
 import java.util.List;
-
 public class Cuarentena {
     private final List<Mensaje> lista = new LinkedList<>();
     private boolean finRecibido = false;
-
     public synchronized void agregar(Mensaje m, int tiempoMs) {
         if (m.tipo == Tipo.FIN) { 
             finRecibido = true;
@@ -29,7 +27,6 @@ public class Cuarentena {
         }
         return listos;
     }
-
     public synchronized boolean vacia() { return lista.isEmpty(); }
     public synchronized boolean fin() { return finRecibido; }
 }
