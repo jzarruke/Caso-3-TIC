@@ -17,9 +17,7 @@ public class ServidorEntrega extends Thread {
             Mensaje m = entrega.extraer();
             if (m == null) break;
             if (m.tipo == Tipo.FIN) break;
-            try {
-                Thread.sleep(200 + rnd.nextInt(400));
-            } catch (InterruptedException ignored) {}
+            try { Thread.sleep(200 + rnd.nextInt(400)); } catch (InterruptedException ignored) {}
         }
     }
 }

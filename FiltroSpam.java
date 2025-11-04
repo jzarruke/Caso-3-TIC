@@ -32,7 +32,6 @@ public class FiltroSpam extends Thread {
                 int duracion = 10000 + rnd.nextInt(10001);
                 cuarentena.agregar(m, duracion);
             } else entrega.depositar(m);
-            coord.intentarCerrar(numServidores);
         }
     }
 }
