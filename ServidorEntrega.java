@@ -1,25 +1,18 @@
-import java.util.*;
-
 public class ServidorEntrega extends Thread {
-    int idServidor;
-    BuzonEntrega entrega;
-    Random rnd;
+    private final BuzonEntrega entrega;
 
-    public ServidorEntrega(int idServidor, BuzonEntrega entrega) {
-        super("ServidorEntrega-" + idServidor);
-        this.idServidor = idServidor;
+    public ServidorEntrega(int id, BuzonEntrega entrega) {
+        super("ServidorEntrega-" + id);
         this.entrega = entrega;
-        this.rnd = new Random();
     }
 
+    @Override
     public void run() {
         while (true) {
             Mensaje m = entrega.extraer();
-            if (m == null) break;
             if (m.tipo == Tipo.FIN) break;
-            try {
-                Thread.sleep(200 + rnd.nextInt(400));
-            } catch (InterruptedException ignored) {}
+            try { Thread.sleep(50 + (int)(Math.random()*100)); }
+            catch (InterruptedException ignored) {}
         }
     }
 }

@@ -5,7 +5,10 @@ public class BuzonEntrada {
     private final Queue<Mensaje> cola = new ArrayDeque<>();
     private final int capacidad;
 
-    public BuzonEntrada(int capacidad) { this.capacidad = capacidad; }
+    public BuzonEntrada(int capacidad) {
+        if (capacidad <= 0) throw new IllegalArgumentException("capEntrada debe ser > 0");
+        this.capacidad = capacidad;
+    }
 
     public synchronized void depositar(Mensaje m) {
         while (cola.size() >= capacidad) {

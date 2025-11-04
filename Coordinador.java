@@ -8,10 +8,12 @@ public class Coordinador {
 
     private boolean finEntrega = false;
     private boolean finCuarentena = false;
+    private boolean finFiltros = false;
 
-    private final Evento posibleCierre = new Evento();
-
-    public Coordinador(int totalClientes, BuzonEntrada entrada, Cuarentena cuarentena, BuzonEntrega entrega) {
+    public Coordinador(int totalClientes,
+                       BuzonEntrada entrada,
+                       Cuarentena cuarentena,
+                       BuzonEntrega entrega) {
         this.totalClientes = totalClientes;
         this.entrada = entrada;
         this.cuarentena = cuarentena;
@@ -20,23 +22,30 @@ public class Coordinador {
 
     public synchronized void registrarFinCliente() {
         finClientes++;
-        if (finClientes >= totalClientes) posibleCierre.señalar();
+        notifyAll();
     }
-    public void intentarCerrar(int servidores) {
+    public void intentarCerrar(int servidores, int filtros) {
         synchronized (this) {
-            boolean listo = (finClientes >= totalClientes) && entrada.vacio() && cuarentena.vacia();
+            boolean listo = (finClientes >= totalClientes
+                           && entrada.vacio()
+                           && cuarentena.vacia());
             if (!listo) return;
 
             if (!finEntrega) {
                 finEntrega = true;
-                entrega.depositar(Mensaje.fin("ENTREGA"));
-                entrega.prepararFin(servidores); 
+                entrega.prepararFin(servidores);
             }
             if (!finCuarentena) {
                 finCuarentena = true;
                 cuarentena.agregar(Mensaje.fin("CUARENTENA"), 0);
             }
+            if (!finFiltros) {
+                finFiltros = true;
+                for (int i = 0; i < filtros; i++) {
+                    
+                    entrada.depositar(Mensaje.fin("FILTRO-" + i));
+                }
+            }
         }
     }
-    public void esperarCierre() { posibleCierre.esperar(); }
 }

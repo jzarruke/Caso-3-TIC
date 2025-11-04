@@ -1,29 +1,25 @@
-import java.util.*;
+import java.util.Random;
 
 public class Cliente extends Thread {
-    int idCliente;
-    int numMensajes;
-    BuzonEntrada entrada;
-    Coordinador coord;
-    Random rnd;
+    private final int id;
+    private final int correos;
+    private final BuzonEntrada entrada;
+    private final Random rnd = new Random();
 
-    public Cliente(int idCliente, int numMensajes, BuzonEntrada entrada, Coordinador coord) {
-        super("Cliente-" + idCliente);
-        this.idCliente = idCliente;
-        this.numMensajes = numMensajes;
+    public Cliente(int id, int correos, BuzonEntrada entrada) {
+        super("Cliente-" + id);
+        this.id = id;
+        this.correos = correos;
         this.entrada = entrada;
-        this.coord = coord;
-        this.rnd = new Random();
     }
 
+    @Override
     public void run() {
-        entrada.depositar(Mensaje.inicio(idCliente));
-        for (int i = 1; i <= numMensajes; i++) {
+        entrada.depositar(Mensaje.inicio(id));
+        for (int i = 1; i <= correos; i++) {
             boolean spam = rnd.nextBoolean();
-            Mensaje m = Mensaje.correo(idCliente, "C" + idCliente + "-M" + i, spam);
-            entrada.depositar(m);
+            entrada.depositar(Mensaje.correo(id, id + "-" + i, spam));
         }
-        entrada.depositar(Mensaje.fin("CLIENTE-" + idCliente));
-        coord.registrarFinCliente();
+        entrada.depositar(Mensaje.fin("CLIENTE-" + id));
     }
 }

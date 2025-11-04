@@ -1,13 +1,12 @@
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 public class Cuarentena {
     private final List<Mensaje> lista = new LinkedList<>();
     private boolean finRecibido = false;
-    private final Random rnd = new Random();
+
     public synchronized void agregar(Mensaje m, int tiempoMs) {
-        if (m.tipo == Tipo.FIN) {
+        if (m.tipo == Tipo.FIN) { 
             finRecibido = true;
             notifyAll();
             return;
@@ -16,15 +15,13 @@ public class Cuarentena {
         lista.add(m);
         notifyAll();
     }
-
     public synchronized List<Mensaje> revisar(int deltaMs) {
         List<Mensaje> listos = new LinkedList<>();
-        for (int i = 0; i < lista.size();) {
+        for (int i = 0; i < lista.size(); ) {
             Mensaje m = lista.get(i);
             m.tiempoCuarentena -= deltaMs;
             if (m.tiempoCuarentena <= 0) {
-                int r = 1 + rnd.nextInt(21); 
-                if (r % 7 != 0) listos.add(m); 
+                listos.add(m);
                 lista.remove(i);
             } else {
                 i++;
@@ -34,5 +31,5 @@ public class Cuarentena {
     }
 
     public synchronized boolean vacia() { return lista.isEmpty(); }
-    public synchronized boolean fin()   { return finRecibido; }
+    public synchronized boolean fin() { return finRecibido; }
 }

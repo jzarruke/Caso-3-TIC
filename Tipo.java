@@ -1,3 +1,3 @@
-public enum Tipo{
+public enum Tipo {
     INICIO, CORREO, FIN
 }

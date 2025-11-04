@@ -1,36 +1,41 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Principal {
     public static void main(String[] args) throws Exception {
-        Configuracion cfg = new Configuracion("recursos/config.txt");
-        int numClientes = cfg.getNumClientes();
-        int mensajesPorCliente = cfg.getMensajesPorCliente();
-        int numFiltros = cfg.getNumFiltros();
-        int numServidores = cfg.getNumServidores();
-        int capacidadEntrada = cfg.getCapacidadEntrada();
-        int capacidadEntrega = cfg.getCapacidadEntrega();
-        BuzonEntrada entrada = new BuzonEntrada(capacidadEntrada);
+        String archivo = (args.length > 0) ? args[0] : "recursos/config.txt";
+        Configuracion cfg = Configuracion.cargar(archivo);
+
+        BuzonEntrada entrada = new BuzonEntrada(cfg.capEntrada);
+        BuzonEntrega entrega = new BuzonEntrega(cfg.capEntrega);
         Cuarentena cuarentena = new Cuarentena();
-        BuzonEntrega entrega = new BuzonEntrega(capacidadEntrega);
-        Coordinador coord = new Coordinador(numClientes, entrada, cuarentena, entrega);
-        List<Thread> clientes = new ArrayList<>();
-        for (int i = 0; i < numClientes; i++) clientes.add(new Cliente(i + 1, mensajesPorCliente, entrada, coord));
-        List<Thread> filtros = new ArrayList<>();
-        for (int i = 0; i < numFiltros; i++) filtros.add(new FiltroSpam(i + 1, entrada, cuarentena, entrega, coord, numServidores));
-        AdministradorCuarentena admin = new AdministradorCuarentena(cuarentena, entrega);
-        List<Thread> servidores = new ArrayList<>();
-        for (int i = 0; i < numServidores; i++) servidores.add(new ServidorEntrega(i + 1, entrega));
-        for (Thread t: clientes) t.start();
-        for (Thread t: filtros) t.start();
-        admin.start();
-        for (Thread t: servidores) t.start();
-        for (Thread t: clientes) t.join();
-        for (Thread t: filtros) t.join();
-        admin.join();
-        for (Thread t: servidores) t.join();
-        System.out.println("=== SISTEMA FINALIZADO ===");
-        System.out.println("Buzón de entrada vacío: " + entrada.vacio());
-        System.out.println("Cuarentena vacía: " + cuarentena.vacia());
-        System.out.println("Buzón de entrega vacío: " + entrega.vacio());
+        Coordinador coord = new Coordinador(cfg.clientes, entrada, cuarentena, entrega);
+
+        List<Thread> hilos = new ArrayList<>();
+
+        for (int i = 1; i <= cfg.clientes; i++) {
+            hilos.add(new Cliente(i, cfg.correos, entrada));
+        }
+
+        for (int i = 1; i <= cfg.filtros; i++) {
+            hilos.add(new FiltroSpam(i, entrada, cuarentena, entrega, coord,
+                                     cfg.servidores, cfg.filtros));
+        }
+
+        hilos.add(new AdministradorCuarentena(cuarentena, entrega, coord,
+                                              cfg.servidores, cfg.filtros));
+
+        for (int i = 1; i <= cfg.servidores; i++) {
+            hilos.add(new ServidorEntrega(i, entrega));
+        }
+
+        for (Thread t : hilos) t.start();
+        for (Thread t : hilos) t.join();
+        System.out.println(
+            "Ejecución terminada. " +
+            "Entrada vacía=" + entrada.vacio() +
+            ", Entrega vacía=" + entrega.vacio() +
+            ", Cuarentena vacía=" + cuarentena.vacia()
+        );
     }
 }

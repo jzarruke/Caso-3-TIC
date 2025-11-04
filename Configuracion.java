@@ -1,43 +1,22 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class Configuracion {
-    private final Properties p = new Properties();
+    public final int clientes, correos, filtros, servidores, capEntrada, capEntrega;
 
-    public Configuracion(String ruta) throws Exception {
-        try (BufferedReader br = new BufferedReader(new FileReader(ruta))) {
-            String s;
-            while ((s = br.readLine()) != null) {
-                s = s.trim();
-                if (s.isEmpty() || s.startsWith("#")) continue;
-                int k = s.indexOf('=');
-                if (k > 0) p.setProperty(s.substring(0, k).trim(), s.substring(k + 1).trim());
-            }
+    public Configuracion(int c, int e, int f, int s, int ce, int cd) {
+        this.clientes = c; this.correos = e; this.filtros = f;
+        this.servidores = s; this.capEntrada = ce; this.capEntrega = cd;
+    }
+    public static Configuracion cargar(String path) throws Exception {
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            int c  = Integer.parseInt(br.readLine().trim());
+            int e  = Integer.parseInt(br.readLine().trim());
+            int f  = Integer.parseInt(br.readLine().trim());
+            int s  = Integer.parseInt(br.readLine().trim());
+            int ce = Integer.parseInt(br.readLine().trim());
+            int cd = Integer.parseInt(br.readLine().trim());
+            return new Configuracion(c, e, f, s, ce, cd);
         }
-    }
-
-    public int getNumClientes() {
-        return Integer.parseInt(p.getProperty("num_clientes"));
-    }
-
-    public int getMensajesPorCliente() {
-        return Integer.parseInt(p.getProperty("mensajes_por_cliente"));
-    }
-
-    public int getNumFiltros() {
-        return Integer.parseInt(p.getProperty("num_filtros"));
-    }
-
-    public int getNumServidores() {
-        return Integer.parseInt(p.getProperty("num_servidores"));
-    }
-
-    public int getCapacidadEntrada() {
-        return Integer.parseInt(p.getProperty("capacidad_entrada"));
-
-    }
-
-    public int getCapacidadEntrega() {
-        return Integer.parseInt(p.getProperty("capacidad_entrega"));
     }
 }

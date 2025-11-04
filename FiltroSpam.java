@@ -1,38 +1,71 @@
-import java.util.*;
+import java.util.Random;
 
 public class FiltroSpam extends Thread {
-    int idFiltro;
-    int numServidores;
-    BuzonEntrada entrada;
-    Cuarentena cuarentena;
-    BuzonEntrega entrega;
-    Coordinador coord;
-    Random rnd;
+    private final BuzonEntrada entrada;
+    private final Cuarentena cuarentena;
+    private final BuzonEntrega entrega;
+    private final Coordinador coord;
+    private final int servidores;
+    private final int filtros;
+    private final Random rnd = new Random();
 
-    public FiltroSpam(int idFiltro, BuzonEntrada entrada, Cuarentena cuarentena, BuzonEntrega entrega, Coordinador coord, int numServidores) {
-        super("FiltroSpam-" + idFiltro);
-        this.idFiltro = idFiltro;
+    public FiltroSpam(int id,
+                      BuzonEntrada entrada,
+                      Cuarentena cuarentena,
+                      BuzonEntrega entrega,
+                      Coordinador coord,
+                      int servidores,
+                      int filtros) {
+        super("FiltroSpam-" + id);
         this.entrada = entrada;
         this.cuarentena = cuarentena;
         this.entrega = entrega;
         this.coord = coord;
-        this.numServidores = numServidores;
-        this.rnd = new Random();
+        this.servidores = servidores;
+        this.filtros = filtros;
     }
 
+    @Override
     public void run() {
         while (true) {
             Mensaje m = entrada.extraer();
-            if (m.tipo == Tipo.INICIO) continue;
-            if (m.tipo == Tipo.FIN) {
-                coord.intentarCerrar(numServidores);
-                break;
+
+            if (m.tipo == Tipo.CORREO) {
+                if (m.esSpam) {
+                    int ms = 200 + rnd.nextInt(2000);
+                    cuarentena.agregar(m, ms);
+                    Thread.yield();
+                } else {
+                    publicarEnEntrega(m);
+                }
+            } else if (m.tipo == Tipo.FIN) {
+                if (m.id.startsWith("FIN-FILTRO-")) {
+                    break; 
+                } else if (m.id.startsWith("FIN-CLIENTE-") || m.id.startsWith("FIN-CLIENTE")) {
+                    coord.registrarFinCliente();
+                    coord.intentarCerrar(servidores, filtros);
+                    continue;
+                } else {
+                    coord.registrarFinCliente();
+                    coord.intentarCerrar(servidores, filtros);
+                    continue;
+                }
             }
-            if (m.esSpam) {
-                int duracion = 10000 + rnd.nextInt(10001);
-                cuarentena.agregar(m, duracion);
-            } else entrega.depositar(m);
-            coord.intentarCerrar(numServidores);
+
+            coord.intentarCerrar(servidores, filtros);
+        }
+        coord.intentarCerrar(servidores, filtros);
+    }
+
+    private void publicarEnEntrega(Mensaje m) {
+        boolean hecho = false;
+        while (!hecho) {
+            try {
+                entrega.depositar(m);
+                hecho = true;
+            } catch (Exception ignored) {
+                try { Thread.sleep(20); } catch (InterruptedException ignored2) {}
+            }
         }
     }
 }
