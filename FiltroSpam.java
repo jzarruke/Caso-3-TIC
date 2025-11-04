@@ -24,7 +24,10 @@ public class FiltroSpam extends Thread {
         while (true) {
             Mensaje m = entrada.extraer();
             if (m.tipo == Tipo.INICIO) continue;
-            if (m.tipo == Tipo.FIN) break;
+            if (m.tipo == Tipo.FIN) {
+                coord.intentarCerrar(numServidores);
+                break;
+            }
             if (m.esSpam) {
                 int duracion = 10000 + rnd.nextInt(10001);
                 cuarentena.agregar(m, duracion);
